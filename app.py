@@ -25,6 +25,24 @@ else:
 st.set_page_config(layout="wide")
 st.title("🎵 音乐-图像 匹配标注工具（三分类）")
 
+# ====== 项目说明 ====== #
+st.markdown(
+    """
+    <div style='background-color:#f0f2f6; padding: 20px; border-radius: 10px;'>
+        <h3>📘 使用说明</h3>
+        <ul>
+            <li>🔊 每页播放一首音乐，下面显示多张候选图像。</li>
+            <li>✅ 对每张图像选择是否与音乐意境相符：“是”、“否” 或 “中性”（不想选就保留中性就行）。</li>
+            <li>💾 每次点击“保存当前页标注”按钮将保存当前结果（不保存不会被记录）。</li>
+            <li>➡️ 通过“上一首 / 下一首”按钮浏览其他音乐。</li>
+            <li>📥 最后点击底部“下载全部标注为 CSV 文件”按钮获取所有的标注记录，发送给我，谢谢。</li>
+            <li> 能力有限，麻烦翻页后手动滑到顶部播放音乐。</li>
+        </ul>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 # ====== 读取音频路径 ====== #
 def find_audio(song_id):
     for file in glob.glob(f"{AUDIO_DIR}/**/{song_id}.mp3", recursive=True):
