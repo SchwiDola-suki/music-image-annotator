@@ -48,7 +48,7 @@ def render_image_columns(song_id, row, col_names, group_label, section_title):
             img_path = os.path.join(IMAGE_DIR, img_id)
             with cols[col_idx]:
                 if os.path.exists(img_path):
-                    st.image(img_path, use_column_width=True, caption=img_id)
+                    st.image(img_path, use_container_width=True, caption=img_id)
                     key_base = f"{song_id}_{col}"
                     selected_label = st.radio(
                         "",
@@ -108,10 +108,15 @@ all_rows += render_image_columns(song_id, row, city_cols, group_label="city", se
 st.markdown("---")
 col1, col2, col3 = st.columns([1, 1, 2])
 
-# 初始化保存状态（仅首次）
-if "saved_rows" not in st.session_state:
-    st.session_state.saved_rows = []
-    st.session_state.annotated = set()
+# 添加滚动到顶部脚本（延迟执行保证有效）
+st.markdown(
+    """
+    <script>
+        window.scrollTo({top: 0, behavior: "instant"});
+    </script>
+    """,
+    unsafe_allow_html=True
+)
 
 with col1:
     if st.button("⬅️ 上一首") and st.session_state.page_index > 0:
@@ -126,22 +131,8 @@ with col2:
 with col3:
     if st.button("✅ 保存当前页标注（翻页前要按一下）"):
         for r in all_rows:
-            if (r['song_id'], r['image_id']) not in st.session_state.annotated:
-                st.session_state.saved_rows.append(r)
-                st.session_state.annotated.add((r['song_id'], r['image_id']))
-        st.success("✅ 当前页标注已保存")
-
-# ====== 下载按钮区 ====== #
-st.markdown("### 📦 下载全部标注结果")
-
-if st.session_state.saved_rows:
-    df_export = pd.DataFrame(st.session_state.saved_rows)
-    csv_data = df_export.to_csv(index=False, encoding="utf-8-sig").encode("utf-8-sig")
-    st.download_button(
-        label="📥 下载全部标注为 CSV 文件",
-        data=csv_data,
-        file_name="final_annotations.csv",
-        mime="text/csv"
-    )
-else:
-    st.info("⚠️ 当前尚未保存任何标注，请先开始标注并保存")
+            if (r['song_id'], r['image_id']) not in annotated:
+                saved_rows.append(r)
+                annotated.add((r['song_id'], r['image_id']))
+        pd.DataFrame(saved_rows).to_csv(OUTPUT_CSV, index=False, encoding="utf-8-sig")
+        st.success(f"✅ 已保存至本地文件：{OUTPUT_CSV}")
