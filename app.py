@@ -48,7 +48,7 @@ def render_image_columns(song_id, row, col_names, group_label, section_title):
             img_path = os.path.join(IMAGE_DIR, img_id)
             with cols[col_idx]:
                 if os.path.exists(img_path):
-                    st.image(img_path, use_column_width=True, caption=img_id)
+                    st.image(img_path, use_container_width=True, caption=img_id)
                     key_base = f"{song_id}_{col}"
                     selected_label = st.radio(
                         "",
@@ -108,14 +108,26 @@ all_rows += render_image_columns(song_id, row, city_cols, group_label="city", se
 st.markdown("---")
 col1, col2, col3 = st.columns([1, 1, 2])
 
+# 添加滚动到顶部脚本（延迟执行保证有效）
+st.markdown(
+    """
+    <script>
+        window.scrollTo({top: 0, behavior: "instant"});
+    </script>
+    """,
+    unsafe_allow_html=True
+)
+
 with col1:
     if st.button("⬅️ 上一首") and st.session_state.page_index > 0:
         st.session_state.page_index -= 1
-        st.experimental_rerun()
+        st.rerun()
+
 with col2:
     if st.button("➡️ 下一首") and st.session_state.page_index < len(df) - 1:
         st.session_state.page_index += 1
-        st.experimental_rerun()
+        st.rerun()
+
 with col3:
     if st.button("✅ 保存当前页标注（翻页前要按一下）"):
         for r in all_rows:
